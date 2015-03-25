@@ -21,7 +21,7 @@ Graph graphInit(int V){ /*inicializa o grafo com V vertices */
 }
 
 void insertEdge(Graph G,int u, int v){ /*adiciona uma aresta ao grafo */
-  link a;
+  //link a;
   //for(a = G->adj[u]; a != NULL; a = a->next)
   //  if(a->x == v) return;
   G->adj[u] = newNode(v, G->adj[v]);

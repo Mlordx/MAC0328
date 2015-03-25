@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <graph.h>
+#include "graph.h"
 
 int* grau;
 int* pai;
@@ -13,7 +13,7 @@ int numVertices;
 void dfs(int);
 /////////////////////
 
-int main(int argc, char* argv){
+int main(int argc, char** argv){
   
   while(scanf("%d",&numVertices) != EOF){
     ////////////////////Inicializacao/////////////
@@ -32,30 +32,30 @@ int main(int argc, char* argv){
       }
     }
     //////////////////////////////////////////////
-    
+    dfs(0);
+    for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,pai[k]);
   }
   return 0;
+}
+
+
+void dfs_visit(int u){
+  link aux = malloc(sizeof(link));
+  for(aux = G->adj[u]; aux != NULL; aux = aux->next){
+    if(pai[aux->x] == -1){
+      pai[aux->x] = u;
+      dfs_visit(aux->x);
+    }
+  }
 }
 
 
 void dfs(int r){
   int i;
   for(i = 0; i < numVertices; i++){
-    pai[i] = NULL;
+    pai[i] = -1;
   }
   pai[r] = r;
-  dfs-visit(r);
+  dfs_visit(r);
 }
 
-void dfs-visit(int u){
-  link aux;
-
-  for(aux = G->adj[u]; aux != NULL; aux = aux->prox){
-    if(pai[u] == NULL){
-      pai[aux->x] = u;
-      dfs-visit(aux->x);
-    }
-  }
-  
-
-}

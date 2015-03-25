@@ -1,5 +1,13 @@
 #ifndef GRAPH_H
 #define GRAPH_H
+
+typedef struct node *link;
+
+struct node{ /*elemento da lista de adjacencia */
+  int x;
+  link next;
+};
+
 struct graph{
   int numV; /* numero de vertices do grafo */
   int numE; /* numero de arcos do grafo */
@@ -8,12 +16,6 @@ struct graph{
 
 typedef struct graph *Graph;
 
-typedef struct node *link;
-
-struct node{ /*elemento da lista de adjacencia */
-  int x;
-  link next;
-};
 
 link newNode(int,link);
 Graph graphInit(int);

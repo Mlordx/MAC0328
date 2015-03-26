@@ -2,8 +2,15 @@
 #include <stdlib.h>
 #include "graph.h"
 
-int* grau;
-int* pai;
+#define INFINITE 200000
+
+int* degree;
+int* father;
+int* discovery;
+int* closure;
+int* articulation;
+int* low;
+int time;
 
 Graph G;
 
@@ -19,43 +26,99 @@ int main(int argc, char** argv){
     ////////////////////Inicializacao/////////////
     int k;
     G = graphInit(numVertices);
-    grau = malloc(numVertices*sizeof(int));
-    pai = malloc(numVertices*sizeof(int));
+    degree = malloc(numVertices*sizeof(int));
+    father = malloc(numVertices*sizeof(int));
+    discovery = malloc(numVertices*sizeof(int));
+    closure = malloc(numVertices*sizeof(int));
+    articulation = malloc(numVertices*sizeof(int));
+    low = malloc(numVertices*sizeof(int));
     
     for(k = 0; k < numVertices; k++){
-      scanf("%d",&grau[k]);
+      scanf("%d",&degree[k]);
       int i;
-      for(i = 0; i < grau[k]; i++){
+      for(i = 0; i < degree[k]; i++){
 	int x;
 	scanf("%d",&x);
 	insertEdge(G,k,x);
       }
     }
     //////////////////////////////////////////////
+    link aux = malloc(sizeof(link));
+    for(aux = G->adj[2]; aux != NULL; aux = aux->next) printf(">%d<\n",aux->x);
     dfs(0);
-    for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,pai[k]);
+    for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,father[k]);
+    for(k = 0; k < numVertices; k++) if(articulation[k]) printf("O vértice %d é de corte\n",k);
   }
   return 0;
 }
 
+int min(int a,int b){
+  if(a < b) return a;
+  return b;
+}
 
-void dfs_visit(int u){
-  link aux = malloc(sizeof(link));
-  for(aux = G->adj[u]; aux != NULL; aux = aux->next){
-    if(pai[aux->x] == -1){
-      pai[aux->x] = u;
-      dfs_visit(aux->x);
-    }
-  }
+int max(int a,int b){
+  if(a > b) return a;
+  return b;
 }
 
 
+void dfs_visit(int u){
+  discovery[u] = time++;
+  int children = 0;
+  low[u] = discovery[u];
+  int maxlow = -1 * INFINITE;
+  
+  link aux = malloc(sizeof(link));
+  
+  for(aux = G->adj[u]; aux != NULL; aux = aux->next){
+    if(father[aux->x] == -1){
+      father[aux->x] = u;
+      dfs_visit(aux->x);
+      children++;
+      low[u] = min(low[u],low[aux->x]);
+      
+      if(low[aux->x] == discovery[aux->x])
+	printf("%d -> %d é ponte\n",u,aux->x);
+      //else
+	//printf("%d -> %d não é ponte\n",u,aux->x);
+      
+      maxlow = max(maxlow,low[aux->x]);
+    }
+    else if(closure[aux->x] == INFINITE){
+      if(aux->x != father[u]){
+	//printf("%d -> %d não é ponte\n",u,aux->x);
+	low[u] = min(low[u],discovery[aux->x]);
+      }
+    }
+  }
+  closure[u] = time++;
+    
+  if(father[u] == u){
+    if(children >= 2)
+      articulation[u] = 1;
+    else
+      articulation[u] = 0;
+  }
+    else{
+      if(maxlow >= discovery[u])
+	articulation[u] = 1;
+      else
+	articulation[u] = 0; 
+    }
+}
+
 void dfs(int r){
   int i;
+  time = 0;
+  
   for(i = 0; i < numVertices; i++){
-    pai[i] = -1;
+    father[i] = -1;
+    articulation[i] = -1;
+    discovery[i] = INFINITE;
+    closure[i] = INFINITE;
   }
-  pai[r] = r;
+  father[r] = r;
   dfs_visit(r);
 }
 

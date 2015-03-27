@@ -29,3 +29,34 @@ void insertEdge(Graph G,int u, int v){ /*adiciona uma aresta ao grafo */
   G->numE++;
 }
     
+void removeVertex(Graph G,int v){
+  link aux;
+  link aux2;
+  link nextnode;
+  link prev = NULL;
+  
+  for(aux = G->adj[v]; aux != NULL; aux = aux->next){
+    prev = NULL;
+    for(aux2 = G->adj[aux->x]; aux2 != NULL; aux2 = nextnode){
+      nextnode = aux2->next;
+      if(aux2->x == v){
+	if(prev != NULL){
+	  prev->next = nextnode;
+	  free(aux2);
+	}
+	else{
+	  if(nextnode != NULL){
+	    G->adj[aux->x]->x = nextnode->x;
+	    G->adj[aux->x]->next = nextnode->next;
+	    free(nextnode);
+	  }
+	  else{
+	    G->adj[aux->x] = NULL;
+	    free(aux2);
+	  }
+	}
+      }
+      prev = aux2;
+    }
+  }
+}		     

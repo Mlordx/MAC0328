@@ -20,4 +20,5 @@ typedef struct graph *Graph;
 link newNode(int,link);
 Graph graphInit(int);
 void insertEdge(Graph,int,int);
+void removeVertex(Graph,int);
 #endif 

@@ -43,9 +43,10 @@ int main(int argc, char** argv){
       }
     }
     //////////////////////////////////////////////
-    link aux = malloc(sizeof(link));
-    for(aux = G->adj[2]; aux != NULL; aux = aux->next) printf(">%d<\n",aux->x);
-    dfs(0);
+    //dfs(0);
+    //for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,father[k]);
+    removeVertex(G,0);
+    dfs(1);
     for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,father[k]);
     for(k = 0; k < numVertices; k++) if(articulation[k]) printf("O vértice %d é de corte\n",k);
   }
@@ -80,14 +81,11 @@ void dfs_visit(int u){
       
       if(low[aux->x] == discovery[aux->x])
 	printf("%d -> %d é ponte\n",u,aux->x);
-      //else
-	//printf("%d -> %d não é ponte\n",u,aux->x);
       
       maxlow = max(maxlow,low[aux->x]);
     }
     else if(closure[aux->x] == INFINITE){
       if(aux->x != father[u]){
-	//printf("%d -> %d não é ponte\n",u,aux->x);
 	low[u] = min(low[u],discovery[aux->x]);
       }
     }
@@ -121,4 +119,3 @@ void dfs(int r){
   father[r] = r;
   dfs_visit(r);
 }
-

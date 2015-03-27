@@ -43,10 +43,8 @@ int main(int argc, char** argv){
       }
     }
     //////////////////////////////////////////////
-    //dfs(0);
-    //for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,father[k]);
-    removeVertex(G,0);
-    dfs(1);
+    removeVertex(G,2);
+    dfs(0);
     for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,father[k]);
     for(k = 0; k < numVertices; k++) if(articulation[k]) printf("O vértice %d é de corte\n",k);
   }

@@ -1,23 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "stack.h"
 #include "graph.h"
 
 #define INFINITE 200000
 
-int* degree;
+//int* deleted;
+//int* block;
 int* father;
 int* discovery;
-int* closure;
+int* degree;
+//int* closure;
 int* articulation;
 int* low;
+int* visited;
+
 int time;
+int numBlocks;
 
 Graph G;
 
 int numVertices;
 
 //////////////////////
-void dfs(int);
+void dfs(int,int);
+void biconnectedComponents();
 /////////////////////
 
 int main(int argc, char** argv){
@@ -26,12 +33,15 @@ int main(int argc, char** argv){
     ////////////////////Inicializacao/////////////
     int k;
     G = graphInit(numVertices);
-    degree = malloc(numVertices*sizeof(int));
+    //deleted = malloc(numVertices*sizeof(int));
+    //block = malloc(numVertices*sizeof(int));
     father = malloc(numVertices*sizeof(int));
     discovery = malloc(numVertices*sizeof(int));
-    closure = malloc(numVertices*sizeof(int));
+    //closure = malloc(numVertices*sizeof(int));
     articulation = malloc(numVertices*sizeof(int));
     low = malloc(numVertices*sizeof(int));
+    visited = malloc(numVertices*sizeof(int));
+    degree = malloc(numVertices*sizeof(int));
     
     for(k = 0; k < numVertices; k++){
       scanf("%d",&degree[k]);
@@ -42,11 +52,27 @@ int main(int argc, char** argv){
 	insertEdge(G,k,x);
       }
     }
-    //////////////////////////////////////////////
-    removeVertex(G,2);
-    dfs(0);
-    for(k = 0; k < numVertices; k++) printf(" o pai de %d é %d\n",k,father[k]);
-    for(k = 0; k < numVertices; k++) if(articulation[k]) printf("O vértice %d é de corte\n",k);
+    biconnectedComponents();
+
+    link aux;
+    /*
+    for(k = 0; k < numVertices; k++){
+      for(aux = G->adj[k]; aux != NULL; aux=aux->next){
+	printf("%d ",aux->x);
+      }
+      puts("");
+    }
+    */
+    printf("%d\n",numVertices);
+    for(k = 0; k < numVertices; k++){
+      printf("%d ",degree[k]);
+      for(aux = G->adj[k]; aux != NULL; aux=aux->next){
+	printf("%d ",aux->block);
+      }
+      puts("");
+    }
+
+    puts("\n\n");
   }
   return 0;
 }
@@ -61,7 +87,76 @@ int max(int a,int b){
   return b;
 }
 
+void outputComp(int u, int v){
+  linkE aux;
 
+  link a;
+  
+  aux = pop();
+  
+  printf("BLOCO %d> \n",numBlocks);
+  while(!(u == aux->u && v == aux->v) && !(u == aux->v && v == aux->u)){
+    printf("%d -> %d |",aux->u,aux->v);
+    
+    for(a = G->adj[aux->u]; a != NULL; a = a->next)
+      if(a->x == aux->v)
+	a->block = numBlocks;
+    
+    for(a = G->adj[aux->v]; a != NULL; a = a->next)
+      if(a->x == aux->u)
+	a->block = numBlocks;
+      
+    
+    aux = pop();
+  }
+  printf("%d -> %d\n",aux->u,aux->v);
+  
+  for(a = G->adj[aux->u]; a != NULL; a = a->next)
+    if(a->x == aux->v)
+      a->block = numBlocks;
+    
+  for(a = G->adj[aux->v]; a != NULL; a = a->next)
+    if(a->x == aux->u)
+      a->block = numBlocks;
+  puts("");
+}
+
+void dfs_visit(int u){
+  visited[u] = 1;
+  time++;
+  low[u] = discovery[u] = time;
+
+  link aux;
+  for(aux = G->adj[u]; aux != NULL; aux=aux->next){
+    if(!visited[aux->x]){
+      push(u,aux->x);
+      father[aux->x] = u;
+      dfs_visit(aux->x);
+      if(low[aux->x] >= discovery[u]){
+	outputComp(u,aux->x);
+	numBlocks++;
+      }
+      low[u] = min(low[u],low[aux->x]);
+    }
+    else if(father[u] != aux->x && discovery[aux->x] < discovery[u]){
+      push(u,aux->x);
+      low[u] = min(low[u],discovery[aux->x]);
+    }
+  }
+
+}
+
+void biconnectedComponents(){
+  time = 0;
+  numBlocks = 0;
+  int i;
+  for(i = 0; i  < numVertices; i++){ father[i] = -1; visited[i] = 0;}
+  for(i = 0; i < numVertices; i++) if(!visited[i]) dfs_visit(i);
+  father[0] = 0;
+}
+
+
+/*
 void dfs_visit(int u){
   discovery[u] = time++;
   int children = 0;
@@ -69,6 +164,8 @@ void dfs_visit(int u){
   int maxlow = -1 * INFINITE;
   
   link aux = malloc(sizeof(link));
+  
+  block[u] = numBlocks;
   
   for(aux = G->adj[u]; aux != NULL; aux = aux->next){
     if(father[aux->x] == -1){
@@ -107,7 +204,7 @@ void dfs_visit(int u){
 void dfs(int r){
   int i;
   time = 0;
-  
+
   for(i = 0; i < numVertices; i++){
     father[i] = -1;
     articulation[i] = -1;
@@ -117,3 +214,4 @@ void dfs(int r){
   father[r] = r;
   dfs_visit(r);
 }
+*/

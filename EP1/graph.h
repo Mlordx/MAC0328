@@ -5,6 +5,7 @@ typedef struct node *link;
 
 struct node{ /*elemento da lista de adjacencia */
   int x;
+  int block;
   link next;
 };
 
